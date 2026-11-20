@@ -84,6 +84,7 @@ module.exports = {
         type: Sequelize.ENUM(
           "PROSPECT_CREATED",
           "DRAWINGS_RECEIVED",
+          "DRAWINGS_UPLODED",
           "ESTIMATION_IN_PROGRESS",
           "ESTIMATION_COMPLETED",
           "BOQ_PREPARED",

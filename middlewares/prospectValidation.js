@@ -1,5 +1,5 @@
-const { body,param  } = require("express-validator");
-const { Prospect } = require("../models");
+const { body, param, query } = require("express-validator");
+const { Prospect, Company } = require("../models");
 const { Op } = require("sequelize");
 
 const PROSPECT_TYPES = ["Individual", "Company", "Builder / Developer", "Contractor", "Consultant", "Other"];
@@ -13,7 +13,16 @@ const PHONE_REGEX = /^\+?[0-9][0-9\s-]{8,14}$/;
 const optional = { checkFalsy: true };
 
 exports.createProspectRules = [
-  // ---------- A. Basic Prospect Details ----------
+  body("companyId")
+    .notEmpty().withMessage("Company ID is required").bail()
+    .isInt({ min: 1 }).withMessage("Invalid company ID").bail()
+    .toInt()
+    .custom(async (companyId) => {
+      const company = await Company.findByPk(companyId, { attributes: ["id"] });
+      if (!company) throw new Error("Company not found");
+      return true;
+    }),
+
   body("prospectType")
     .trim().notEmpty().withMessage("Prospect type is required").bail(),
   
@@ -105,6 +114,25 @@ exports.createProspectRules = [
 
 exports.prospectIdRule = [
   param("id").isInt({ min: 1 }).withMessage("Invalid prospect id").toInt(),
+];
+
+exports.documentOwnerRules = [
+  query("ownerId").isInt({ min: 1 }).withMessage("Invalid owner id").toInt(),
+  query("ownerType")
+    .isIn(["prospect", "client", "project"])
+    .withMessage("Owner type must be prospect, client, or project"),
+];
+
+exports.companyIdQueryRule = [
+  query("companyId")
+    .notEmpty().withMessage("Company ID is required").bail()
+    .isInt({ min: 1 }).withMessage("Invalid company ID").bail()
+    .toInt()
+    .custom(async (companyId) => {
+      const company = await Company.findByPk(companyId, { attributes: ["id"] });
+      if (!company) throw new Error("Company not found");
+      return true;
+    }),
 ];
 
 exports.updateProspectRules = [
