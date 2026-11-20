@@ -3,6 +3,10 @@ const { Model, DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
     class Prospect extends Model {
         static associate(models) {
+            Prospect.belongsTo(models.Company, {
+                foreignKey: 'companyId', as: 'company'
+            });
+
             Prospect.belongsTo(models.User, { 
                 foreignKey: 'convertedBy', as: 'convertor' 
             });
@@ -48,6 +52,10 @@ module.exports = (sequelize) => {
                 type: DataTypes.STRING(20),
                 allowNull: false,
                 unique: true          
+            },
+            companyId: {
+                type: DataTypes.INTEGER,
+                allowNull: true
             },
 
             prospectType: {
@@ -122,6 +130,7 @@ module.exports = (sequelize) => {
                 type: DataTypes.ENUM(
                     "PROSPECT_CREATED",
                     "DRAWINGS_RECEIVED",
+                    "DRAWINGS_UPLODED",
                     "ESTIMATION_IN_PROGRESS",
                     "ESTIMATION_COMPLETED",
                     "BOQ_PREPARED",
@@ -167,6 +176,7 @@ module.exports = (sequelize) => {
             tableName: "prospects",
             timestamps: true,
             indexes: [
+                { fields: ['companyId'] },
                 { fields: ['status'] },
                 { fields: ['mobile'] },
                 { fields: ['email'] }

@@ -28,12 +28,11 @@ exports.createProspect = async (req, res) => {
       { prospect, project, files },
       req.user
     );
-    const data = await prospectService.getProspectById(prospectId);
+    await prospectService.getProspectById(prospectId);
 
     return res.status(201).json({
       success: true,
       message: "Prospect created successfully",
-      data,
     });
   } catch (err) {
     if (err.name === "SequelizeUniqueConstraintError") {
@@ -49,7 +48,7 @@ exports.getAllProspects = async (req, res) => {
     const { page, limit, offset, searchTerm, isAll } = validateQueryParams(req.query);
     const { status, prospectType } = req.query;
 
-    const whereClause = {};
+    const whereClause = { companyId: Number(req.query.companyId) };
 
     if (searchTerm) {
       const like = `%${searchTerm}%`;
@@ -161,7 +160,7 @@ exports.updateProspect = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { project, ...prospect } = matchedData(req, { locations: ["body"] });
-    const projectData = project || {};
+    // const projectData = project || {};
 
     nullifyBlanks(req.body, prospect, CLEARABLE_PROSPECT_FIELDS);
     nullifyBlanks(req.body.project, projectData, CLEARABLE_PROJECT_FIELDS);
@@ -172,12 +171,11 @@ exports.updateProspect = async (req, res) => {
       req.user
     );
 
-    const data = await prospectService.getProspectById(id);
+  //  await prospectService.getProspectById(id);
 
     return res.status(200).json({
       success: true,
       message: "Prospect updated successfully.",
-      data,
     });
   } catch (error) {
     if (error.status) {
@@ -216,6 +214,65 @@ exports.getDocumentById = async (req, res) => {
   } catch (error) {
     console.error("Get Document By Id Error:", error);
     return res.status(500).json({ success: false, message: "Failed to get document." });
+  }
+};
+
+exports.getDocumentsByOwner = async (req, res) => {
+  try {
+    const { page, limit, offset, isAll, searchTerm = "" } = validateQueryParams(req.query);
+    const { rows, count } = await prospectService.getDocumentsByOwner(
+      Number(req.query.ownerId),
+      req.query.ownerType,
+      { limit, offset, isAll,searchTerm: searchTerm.trim(), }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Documents fetched successfully.",
+      data: rows.map((document) => document.toJSON()),
+      pagination: {
+        totalRecords: count,
+        totalPages: isAll ? 1 : Math.ceil(count / limit),
+        currentPage: isAll ? 1 : page,
+        itemsPerPage: isAll ? count : limit,
+        isAll,
+      },
+    });
+  } catch (error) {
+    if (error.status) {
+      return res.status(error.status).json({ success: false, message: error.message });
+    }
+    console.error("Get Documents By Owner Error:", error);
+    return res.status(500).json({ success: false, message: "Failed to get documents." });
+  }
+};
+
+exports.uploadProspectDrawings = async (req, res) => {
+  try {
+    const files = req.files?.drawings || [];
+    if (!files.length) {
+      return res.status(400).json({ success: false, message: "Upload at least one drawing." });
+    }
+
+    const documents = await prospectService.uploadProspectDrawings(
+      Number(req.params.id),
+      files,
+      req.user
+    );
+    return res.status(201).json({
+      success: true,
+      message: "Drawing documents uploaded successfully.",
+      data: documents.map((document) => {
+        const data = document.toJSON();
+        delete data.document;
+        return data;
+      }),
+    });
+  } catch (error) {
+    if (error.status) {
+      return res.status(error.status).json({ success: false, message: error.message });
+    }
+    console.error("Upload Prospect Drawings Error:", error);
+    return res.status(500).json({ success: false, message: "Failed to upload drawing documents." });
   }
 };
 

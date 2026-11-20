@@ -16,6 +16,24 @@ module.exports = (sequelize) => {
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       });
+      Company.hasMany(models.Prospect, {
+        foreignKey: "companyId",
+        as: "prospects",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
+      });
+      Company.hasMany(models.Client, {
+        foreignKey: "companyId",
+        as: "clients",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
+      });
+      Company.hasMany(models.Project, {
+        foreignKey: "companyId",
+        as: "projects",
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
+      });
     }
   }
 

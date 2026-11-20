@@ -3,6 +3,10 @@ const { Model, DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
     class Client extends Model {
         static associate(models) {
+            Client.belongsTo(models.Company, {
+                foreignKey: 'companyId',
+                as: 'company',
+            });
 
             Client.belongsTo(models.User, { 
                 foreignKey: 'createdBy', as: 'creator' 
@@ -40,6 +44,10 @@ module.exports = (sequelize) => {
                 type: DataTypes.STRING(20),
                 allowNull: false,
                 unique: true                
+            },
+            companyId: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
             },
             clientType: {
                 type: DataTypes.STRING(150),
@@ -124,6 +132,7 @@ module.exports = (sequelize) => {
             tableName: "clients",
             timestamps: true,
             indexes: [
+                { fields: ['companyId'] },
                 { fields: ['status'] },
                 { fields: ['gstin'] },
                 { fields: ['pan'] },
