@@ -160,7 +160,7 @@ exports.updateProspect = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { project, ...prospect } = matchedData(req, { locations: ["body"] });
-    // const projectData = project || {};
+    const projectData = project || {};
 
     nullifyBlanks(req.body, prospect, CLEARABLE_PROSPECT_FIELDS);
     nullifyBlanks(req.body.project, projectData, CLEARABLE_PROJECT_FIELDS);
