@@ -11,10 +11,11 @@ const {
 } = require("../middlewares/prospectValidation");
 const { validate } = require("../middlewares/validations");
 const prospectController = require("../controllers/prospectController");
+const { ADMIN,DESIGN_HEAD,INVENTORY_MANAGER,PROJECT_MANAGER,ACCOUNT_MANAGER,CLIENT_MANAGER } = require("../utils/constants");
 
 router.post(
     "/add",
-    authenticate(),
+    authenticate([ADMIN,DESIGN_HEAD,INVENTORY_MANAGER,PROJECT_MANAGER,ACCOUNT_MANAGER,CLIENT_MANAGER]),
     uploadDrawings,
     parseProjectPayload,
     createProspectRules,
@@ -24,7 +25,7 @@ router.post(
 
 router.get(
     "/getAllProspect", 
-    authenticate(),
+    authenticate([ADMIN,DESIGN_HEAD,INVENTORY_MANAGER,PROJECT_MANAGER,ACCOUNT_MANAGER,CLIENT_MANAGER]),
     companyIdQueryRule,
     validate,
     prospectController.getAllProspects
@@ -32,7 +33,7 @@ router.get(
 
 router.get(
     "/getProspectById/:id", 
-    authenticate(),
+    authenticate([ADMIN,DESIGN_HEAD,INVENTORY_MANAGER,PROJECT_MANAGER,ACCOUNT_MANAGER,CLIENT_MANAGER]),
     prospectIdRule, 
     validate, 
     prospectController.getProspectById
@@ -40,13 +41,13 @@ router.get(
 
 router.get(
     "/documents/:id", 
-    authenticate(),
+    authenticate([ADMIN,DESIGN_HEAD,INVENTORY_MANAGER,PROJECT_MANAGER,ACCOUNT_MANAGER,CLIENT_MANAGER]),
     prospectController.getDocumentById
 );
 
 router.get(
     "/documents",
-    authenticate(),
+    authenticate([ADMIN,DESIGN_HEAD,INVENTORY_MANAGER,PROJECT_MANAGER,ACCOUNT_MANAGER,CLIENT_MANAGER]),
     documentOwnerRules,
     validate,
     prospectController.getDocumentsByOwner
@@ -54,7 +55,7 @@ router.get(
 
 router.post(
     "/:id/drawings",
-    authenticate(),
+    authenticate([ADMIN,DESIGN_HEAD,INVENTORY_MANAGER,PROJECT_MANAGER,ACCOUNT_MANAGER,CLIENT_MANAGER]),
     prospectIdRule,
     validate,
     uploadDrawings,
@@ -63,13 +64,13 @@ router.post(
 
 router.delete(
     "/documents/:id",
-    authenticate(),
+    authenticate([ADMIN,DESIGN_HEAD,INVENTORY_MANAGER,PROJECT_MANAGER,ACCOUNT_MANAGER,CLIENT_MANAGER]),
     prospectController.deleteDocumentById
 );
 
 router.put(
     "/edit/:id", 
-    authenticate(),
+    authenticate([ADMIN,DESIGN_HEAD,INVENTORY_MANAGER,PROJECT_MANAGER,ACCOUNT_MANAGER,CLIENT_MANAGER]),
     uploadDrawings, 
     parseProjectPayload,
     updateProspectRules, 
@@ -79,7 +80,7 @@ router.put(
 
 router.delete(
     "/deleteProspect/:id", 
-    authenticate(),
+    authenticate([ADMIN,DESIGN_HEAD,INVENTORY_MANAGER,PROJECT_MANAGER,ACCOUNT_MANAGER,CLIENT_MANAGER]),
     prospectIdRule, 
     validate, 
     prospectController.deleteProspect
